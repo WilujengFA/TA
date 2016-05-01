@@ -32,11 +32,14 @@ float temp_cal=27;
 
 float temp=27;
 
+void timer_setup(void);
 double avergearray(int* arr, int number);
 float pHConversion(float input, float cal_1, float cal_2, float cal_3, float temp, float temp_cal);
 
 void setup()
 {
+    timer_setup();
+
     pinMode(LED,OUTPUT);
     Serial.begin(9600);
     Serial.println("pH meter experiment!");    //Test the serial monitor
@@ -51,9 +54,7 @@ void loop()
       pHArray[pHArrayIndex++]=analogRead(SensorPin);
       if(pHArrayIndex==ArrayLenth)pHArrayIndex=0;
       voltage = avergearray(pHArray, ArrayLenth)*5.1/1024;
-
 //      pHValue = 3.5*voltage+Offset;
-
       pHValue = pHConversion(voltage,v_p10,v_p7,v_p4,temp,temp_cal);
       samplingTime=millis();
     }
@@ -121,12 +122,10 @@ float pHConversion(float input, float cal_1, float cal_2, float cal_3, float tem
     float zero_value;
     float sensitivity;
 
-    if( (temp < 0)||(temp > 100) )
-    {
+    if( (temp < 0)||(temp > 100) ){
         return -1.0;
     }
-    if((temp_cal < 0)||(temp_cal > 100))
-    {
+    if((temp_cal < 0)||(temp_cal > 100)){
         return -2.0;
     }
 
@@ -143,4 +142,22 @@ float pHConversion(float input, float cal_1, float cal_2, float cal_3, float tem
     value = 7.0 + (zero_value-input)/sensitivity;
 
     return value;
+}
+
+void timer_setup(void){
+
+    DDRD |= (1 << DDD6);
+    // PD6 is now an output
+
+    TCCR0A |= (1 << COM0A0) |(1 << COM0A1);
+    // set inverting mode
+
+    TCCR0A |= (1 << WGM00) | (0 << WGM01) | (0 << WGM02);
+    // set phase correct PWM Mode
+
+    TCCR0B |= (1 << CS00) |  (1 << CS01) |  (0 << CS02);
+    // set prescaler to 64 and starts PWM
+
+    OCR0A = 200;
+    // set PWM for 50% duty cycle
 }
