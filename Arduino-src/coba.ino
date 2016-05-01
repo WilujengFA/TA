@@ -25,12 +25,12 @@ unsigned long samplingTime = millis();
 unsigned long printTime = millis();
 float pHValue,voltage;
 
-float v_p10;
-float v_p7;
-float v_p4;
-float temp_cal;
+float v_p10=3.3;
+float v_p7=1.96;
+float v_p4=1.21;
+float temp_cal=27;
 
-float temp;
+float temp=27;
 
 double avergearray(int* arr, int number);
 float pHConversion(float input, float cal_1, float cal_2, float cal_3, float temp, float temp_cal);
